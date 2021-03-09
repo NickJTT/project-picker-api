@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon --exec babel-node index.js",
     "debug": "babel-node debug index.js",
-    "test": "mocha test/*.test.js --timeout 50000"
+    "test": "mocha test/*.test.js --timeout 50000",
+    "build": "docker image build -t project-picker-api . && docker-compose up"
   },
   "repository": {
     "type": "git",

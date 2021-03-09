@@ -1,33 +1,32 @@
 import { expect } from 'chai';
 import request from './helpers/request';
-import { deleteUser, getUserIdFromToken } from './helpers/userHelper';
 
 const URL = 'auth';
 
 describe(URL, () => {
-  let id;
+  let token;
   const data = { username: 'Test Username', password: 'Test Password' };
-  
-  describe('register', () => {
-    it('registers a user successfully', async () => {
+
+  describe('POST', () => {
+    it(`${URL}/register`, async () => {
       const res = await request.post(`${URL}/register`).send(data);
-      id = getUserIdFromToken(res.body.token);
+      token = res.body.token;
       expect(res.body.success).to.eq(true);
       expect(res.body.token).to.not.be.empty;
     });
 
+    it(`${URL}/login`, async () => {
+      const res = await request.post(`${URL}/login`).send(data);
+      expect(res.body.success).to.eq(true);
+      expect(res.body.token).to.not.be.empty;
+    });
+  });
+
+  describe('Negative Tests', () => {
     it('doesn\'t register a user with username already existing in database', async () => {
       const res = await request.post(`${URL}/register`).send(data);
       expect(res.body.success).to.eq(false);
       expect(res.body.message).to.eq('User already exist!');
-    });
-  });
-
-  describe('login', () => {
-    it('logs in successfully', async () => {
-      const res = await request.post(`${URL}/login`).send(data);
-      expect(res.body.success).to.eq(true);
-      expect(res.body.token).to.not.be.empty;
     });
 
     it('doesn\'t login if the username doesn\'t exist in the database', async () => {
@@ -45,7 +44,10 @@ describe(URL, () => {
     });
   });
 
-  after(async () => {
-    await deleteUser(id);
+  describe('DELETE', () => {
+    it(`/${URL}`, async () => {
+      const res = await request.delete(URL).set('token', token);
+      expect(res.body.success).to.eq(true);
+    });
   });
 });

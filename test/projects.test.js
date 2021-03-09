@@ -1,21 +1,21 @@
 import { expect } from 'chai';
 import request from './helpers/request';
-import { createUser, deleteUser, getUserIdFromToken } from './helpers/userHelper';
+import { createUser, deleteUser } from './helpers/userHelper';
 
 const URL = 'projects';
 
 describe(URL, () => {
   const userOne = { username: 'Test Username One', password: 'Test Password' };
   const userTwo = { username: 'Test Username Two', password: 'Test Password' };
-  let tokenOne, tokenTwo, userIdOne, userIdTwo, id;
   const data = { name: 'Test Project Name' };
+  let tokenOne, tokenTwo, id;
 
   before(async () => {
-    tokenOne = await createUser(userOne.username, userOne.password);
-    tokenTwo = await createUser(userTwo.username, userTwo.password);
-
-    userIdOne = getUserIdFromToken(tokenOne);
-    userIdTwo = getUserIdFromToken(tokenTwo);
+    const resOne = await createUser(userOne.username, userOne.password)
+    tokenOne = resOne.body.token;
+  
+    const resTwo = await createUser(userTwo.username, userTwo.password)
+    tokenTwo = resTwo.body.token;
   });
 
   describe('POST', () => {
@@ -74,25 +74,25 @@ describe(URL, () => {
   });
 
   describe('Negative ID Tests', () => {
-    it('Does\'t get a project that does\'t exist', async () => {
+    it('Doesn\'t get a project that does\'t exist', async () => {
       const res = await request.get(`${URL}/${id}`).set('token', tokenOne);
       expect(res.body.success).to.eq(false);
     });
 
-    it('Does\'t put a project that does\'t exist', async () => {
+    it('Doesn\'t put a project that does\'t exist', async () => {
       const data = { name: 'Test Project Name One' };
       const res = await request.put(`${URL}/${id}`).set('token', tokenOne).send(data);
       expect(res.body.success).to.eq(false);
     });
 
-    it('Does\'t delete a project that does\'t exist', async () => {
+    it('Doesn\'t delete a project that does\'t exist', async () => {
       const res = await request.delete(`${ URL }/${ id }`).set('token', tokenOne);
       expect(res.body.success).to.eq(false);
     });
   });
 
   after(async () => {
-    await deleteUser(userIdOne);
-    await deleteUser(userIdTwo);
+    await deleteUser(tokenOne);
+    await deleteUser(tokenTwo);
   });
 });

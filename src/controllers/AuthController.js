@@ -8,4 +8,8 @@ export default class AuthController {
   static login = async(username, password) => {
     return await UsersService.login(username, password);
   }
+
+  static delete = async id => {
+    return await UsersService.delete(id);
+  }
 }

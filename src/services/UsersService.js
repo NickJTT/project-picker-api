@@ -39,20 +39,33 @@ export default class UsersService {
   }
 
   static updateUsername = async (id, username) => {
+    if (await this.userExist(username)) {
+      const message = `User with username "${ username }" exists!`;
+      console.error(message);
+      return false;
+    }
     const user = await this.selectById(id);
     user.username = username;
-    const message = `User with username "${ username }" exists!`;
-    await this.userExist(username) ? console.error(message) : await user.save();
+    await user.save();
+    return true;
   }
 
   static updatePassword = async (id, password) => {
     const user = await this.selectById(id);
-    user.password = password;
-    await user.save();
+    if(user) {
+      user.password = password;
+      await user.save();
+      return true;
+    }
+    return false;
   }
 
   static delete = async id => {
     const user = await this.selectById(id);
-    await user.destroy();
+    if (user) {
+      await user.destroy();
+      return true;
+    }
+    return false;
   }
 };

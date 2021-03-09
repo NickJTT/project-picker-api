@@ -47,4 +47,18 @@ router.get('/is-verified', authorization, async (req, res) => {
   }
 });
 
+router.delete('/', authorization, async (req, res) => {
+  try {
+    const success = await AuthController.delete(req.id);
+    const data = { success };
+    return res.json(data);
+  } catch (ex) {
+    console.error(ex.message);
+    const success = false;
+    const message = 'Server Error!';
+    const data = { success, message };
+    return res.status(500).json(data);
+  }
+});
+
 export default router;

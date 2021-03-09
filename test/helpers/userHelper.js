@@ -1,11 +1,14 @@
 import { verify } from 'jsonwebtoken';
 import { config } from 'dotenv';
-import UsersService from '../../src/services/UsersService';
+import request from './request';
 
 config();
 
+const URL = 'auth';
+
 export const createUser = async (username, password) => {
-  return await UsersService.register(username, password);
+  const data = { username, password };
+  return await request.post(`${URL}/register`).send(data);
 }
 
 export const getUserIdFromToken = token => {
@@ -13,6 +16,6 @@ export const getUserIdFromToken = token => {
   return payload.id;
 }
 
-export const deleteUser = async id => {
-  await UsersService.delete(id);
+export const deleteUser = async token => {
+  await request.delete(URL).set('token', token);
 }
